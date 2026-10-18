@@ -26,6 +26,7 @@ std::string statusToString(JobStatus status) {
     return "Unknown";
 }
 
+// per job
 struct RenderJob {
     int frameId;
     int estimatedRenderTime;
@@ -33,6 +34,7 @@ struct RenderJob {
     JobStatus status;
 };
 
+// all jobs
 class JobManager {
 private:
     std::vector<RenderJob> jobs;
@@ -44,11 +46,10 @@ public:
         // Create a new RenderJob
         RenderJob newJob = {nextJobId, renderTime, priority, JobStatus::Pending};
         jobs.push_back(newJob);
-        // Assign the next available ID
-        // Set status to Pending
-        // Add it to jobs
-        // Return the assigned ID
-        return nextJobId;
+
+        int assignedId = nextJobId;
+        nextJobId++;
+        return assignedId;
     }
 
     int getJobCount() const {
