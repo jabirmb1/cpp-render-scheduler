@@ -1,61 +1,103 @@
 #include <iostream>
-#include <string>
 #include <vector>
+
+enum class JobStatus {
+    Pending,
+    Running,
+    Completed,
+    Failed
+};
+
+std::string statusToString(JobStatus status) {
+    switch (status) {
+        case JobStatus::Pending:
+            return "Pending";
+
+        case JobStatus::Running:
+            return "Running";
+
+        case JobStatus::Completed:
+            return "Completed";
+
+        case JobStatus::Failed:
+            return "Failed";
+    }
+
+    return "Unknown";
+}
 
 struct RenderJob {
     int frameId;
     int estimatedRenderTime;
     int priority;
-    std::string status;
+    JobStatus status;
 };
 
-void printAllJobs(const std::vector<RenderJob>& jobs);
-int findLongestJob(const std::vector<RenderJob>& jobs);
-void updateStatus(std::vector<RenderJob>& jobs, int num, std::string status);
+class JobManager {
+private:
+    std::vector<RenderJob> jobs;
+    int nextJobId = 1;
+
+public:
+    int submitJob(int renderTime, int priority) {
+        // TODO:
+        // Create a new RenderJob
+        RenderJob newJob = {nextJobId, renderTime, priority, JobStatus::Pending};
+        jobs.push_back(newJob);
+        // Assign the next available ID
+        // Set status to Pending
+        // Add it to jobs
+        // Return the assigned ID
+        return nextJobId;
+    }
+
+    int getJobCount() const {
+        // TODO
+        return jobs.size();
+    }
+
+    void printAllJobs() const {
+        // TODO
+        // Print frame ID, render time and priority
+        // Also print a readable status
+        for (const RenderJob& job: jobs) {
+            std::string status = statusToString(job.status);
+
+            std::cout << " frame: " << job.frameId << " Rendering Time: " << job.estimatedRenderTime << " priority: " << job.priority << " status " << status << "\n";
+        }
+    }
+
+    bool updateStatus(int frameId, JobStatus newStatus) {
+        // TODO
+        // Find the matching job
+        // Update its status
+        // Return true if found, false otherwise
+        for (RenderJob& job : jobs) {
+            if (job.frameId == frameId) {
+                job.status = newStatus;
+                return true;
+            }
+        }
+        return false;
+    }
+};
 
 int main() {
-    std::vector<RenderJob> jobs = {
-        {1, 150, 2, "pending"},
-        {2, 600, 1, "pending"},
-        {3, 300, 3, "pending"},
-        {4, 900, 2, "pending"},
-        {5, 450, 1, "pending"}
-    };
+    JobManager manager;
 
-    // Print all jobs
-    printAllJobs(jobs);
+    int firstId = manager.submitJob(150, 2);
+    manager.submitJob(600, 1);
+    manager.submitJob(300, 3);
 
-    std::cout << "Longest frame: " << findLongestJob(jobs) << "\n";
+    manager.printAllJobs();
 
-    updateStatus(jobs, 3, "completed");
+    manager.updateStatus(firstId, JobStatus::Completed);
 
-    printAllJobs(jobs);
-}
+    std::cout << "\nAfter updating:\n";
+    manager.printAllJobs();
 
-void printAllJobs(const std::vector<RenderJob>& jobs) {
-    // Print all jobs again
-    for (const RenderJob& job: jobs) {
-        std::cout << "frame: " << job.frameId << " Rendering Time: " << job.estimatedRenderTime << " priority: " << job.priority << " status " << job.status;
-    }
-}
+    std::cout << "\nTotal jobs: "
+              << manager.getJobCount() << "\n";
 
-int findLongestJob(const std::vector<RenderJob>& jobs) {
-    int longestFrameId = jobs[0].frameId;
-    int longestRenderTime = jobs[0].estimatedRenderTime;
-
-    for (const RenderJob& job : jobs) {
-        if (job.estimatedRenderTime > longestRenderTime) {
-            longestRenderTime = job.estimatedRenderTime;
-            longestFrameId = job.frameId;
-        }
-    }
-    return longestFrameId;
-}
-
-void updateStatus(std::vector<RenderJob>& jobs, int num, std::string status) {
-    for (RenderJob& job : jobs) {
-        if (job.frameId == num) {
-            job.status = status;
-        }
-    }
+    return 0;
 }
